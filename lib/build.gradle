@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'maven-publish'
 }
 
 android {
@@ -28,6 +29,19 @@ android {
     }
     kotlinOptions {
         jvmTarget = '11'
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = "crocodile8008.videoviewcache.lib"
+                artifactId = 'videoviewcache'
+                version = version
+            }
+        }
     }
 }
 
