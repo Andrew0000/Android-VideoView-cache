@@ -7,8 +7,7 @@ It uses okhttp and rxjava inside. Nothing special is needed to use.
 
 [![](https://jitpack.io/v/Andrew0000/Android-VideoView-cache.svg)](https://jitpack.io/#Andrew0000/Android-VideoView-cache)
 
-https://jitpack.io/#Andrew0000/Android-VideoView-cache/Tag
-1. Add maven { url 'https://jitpack.io' } to the `allprojects` or `dependencyResolutionManagement` section in top-leve `build.gradle` or `settings.gradle`
+1. Add `maven { url 'https://jitpack.io' }` to the `allprojects` or `dependencyResolutionManagement` section in top-leve `build.gradle` or `settings.gradle`.  
 For example (`settings.gradle`):
 ```
 dependencyResolutionManagement {
