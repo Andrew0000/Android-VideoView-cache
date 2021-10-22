@@ -21,7 +21,7 @@ dependencyResolutionManagement {
     }
 }
 ```
-2. Add implementation 'com.github.Andrew0000:Android-VideoView-cache:1.0.3' (chek latest version) to the module-level `build.gradle`
+2. Add implementation `'com.github.Andrew0000:Android-VideoView-cache:1.0.3'` (chek latest version) to the module-level `build.gradle`
 
 # Usage:
 Like a VideoView. 
