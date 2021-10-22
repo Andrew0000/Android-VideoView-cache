@@ -40,3 +40,6 @@ And then start loading:
 ```
 cachedVideoView2.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4")
 ```
+That's all!  
+Video will be downloaded, cached and played.  
+On the next invocation it will be loaded from cache.  
