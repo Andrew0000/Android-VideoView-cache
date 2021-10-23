@@ -44,12 +44,9 @@ With **VideoViewCached**. It shows progress bar and performs auto-scaling.
 For example in xml:
 
     <crocodile8008.videoviewcache.lib.VideoViewCached
-        android:id="@+id/cachedVideoView2"
+        android:id="@+id/cachedVideoView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHeight_max="200dp"/>
+        android:layout_height="wrap_content"/>
 
 And then start loading:
 ```
