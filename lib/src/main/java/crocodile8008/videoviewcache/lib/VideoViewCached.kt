@@ -1,6 +1,7 @@
 package crocodile8008.videoviewcache.lib
 
 import android.content.Context
+import android.graphics.Color
 import android.media.MediaPlayer
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -60,7 +61,9 @@ class VideoViewCached : FrameLayout {
         addView(progressBar)
 
         videoView.setOnPreparedListener { mp: MediaPlayer ->
-            progressBar.visibility = GONE
+            if (videoToLoad == null) {
+                progressBar.visibility = GONE
+            }
             mediaPlayer = mp
             if (autoScale) {
                 post {
@@ -104,6 +107,7 @@ class VideoViewCached : FrameLayout {
      */
     @Suppress("Unused")
     fun playUrl(url: String, headers: Map<String, String>? = null) {
+        log("playUrl: $url")
         disposables.clear()
         progressBar.visibility = VISIBLE
         videoToLoad = VideoRequestParam(url, headers)
@@ -116,8 +120,11 @@ class VideoViewCached : FrameLayout {
      */
     @Suppress("Unused")
     fun stop() {
+        log("stop: ${videoToLoad?.url}")
         disposables.clear()
         videoView.stopPlayback()
+        // VideoView may play previous video so it helps to reset.
+        videoView.setBackgroundColor(Color.BLACK)
         playCalled = false
     }
 
@@ -161,9 +168,10 @@ class VideoViewCached : FrameLayout {
                         if (filePath.isEmpty()) {
                             return@subscribe
                         }
+                        videoToLoad = null
                         videoView.setVideoPath(filePath)
                         videoView.start()
-                        videoToLoad = null
+                        videoView.background = null
                     },
                     { t ->
                         progressBar.visibility = GONE

@@ -1,5 +1,6 @@
 package crocodile8008.videoviewcache.lib
 
+import android.graphics.Color
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.VideoView
@@ -81,6 +82,8 @@ fun VideoView.stop() {
     }
     loader.disposables.clear()
     loader.videoView.stopPlayback()
+    // VideoView may play previous video so it helps to reset.
+    loader.videoView.setBackgroundColor(Color.BLACK)
     loader.playCalled = false
 }
 
@@ -112,6 +115,7 @@ private class LoaderData(
                         videoView.setVideoPath(filePath)
                         videoView.start()
                         videoToLoad = null
+                        videoView.background = null
                     },
                     { t ->
                         log("$t")
