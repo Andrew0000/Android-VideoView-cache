@@ -29,6 +29,12 @@ android {
     kotlinOptions {
         jvmTarget = '11'
     }
+
+    flavorDimensions "libDep"
+    productFlavors {
+        libDepLocal { dimension "libDep" }
+        libDepJitpack { dimension "libDep" }
+    }
 }
 
 dependencies {
@@ -38,8 +44,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 
-    implementation project(':lib')
-    //implementation 'com.github.Andrew0000:Android-VideoView-cache:release_1_ready'
+    libDepLocalImplementation project(':lib')
+    libDepJitpackImplementation 'com.github.Andrew0000:Android-VideoView-cache:1.0.3'
 
     testImplementation 'junit:junit:4.+'
 
