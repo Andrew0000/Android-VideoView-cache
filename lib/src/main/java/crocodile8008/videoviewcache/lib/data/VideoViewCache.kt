@@ -31,6 +31,7 @@ internal object VideoViewCache {
             .build()
     }
 
+    //TODO don't allow parallel loading/writing  for same url
     fun loadInFileCached(
         url: String,
         headers: Map<String, String>?,
