@@ -17,9 +17,11 @@ import okio.buffer
 import okio.sink
 import java.io.File
 import java.io.IOException
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.Exception
 import kotlin.math.abs
+import kotlin.random.Random
 
 internal object VideoViewCache {
 
@@ -31,7 +33,6 @@ internal object VideoViewCache {
             .build()
     }
 
-    //TODO don't allow parallel loading/writing  for same url
     fun loadInFileCached(
         url: String,
         headers: Map<String, String>?,
@@ -68,15 +69,16 @@ internal object VideoViewCache {
                 val response: Response = client.newCall(request).execute()
 
                 finalFile.tryDelete()
-                tmpFile = getOutputFile(url, context, isTmp = true)
-                tmpFile.tryDelete()
+                tmpFile = getTempOutputFile(url, context)
 
                 sink = tmpFile.sink().buffer()
                 body = response.body!!
-                sink.writeAll(body.source())
+                val contentLength = body.contentLength()
+                val bytesWrite = sink.writeAll(body.source())
+                sink.flush()
                 tmpFile.renameTo(finalFile)
 
-                log("ready: $url")
+                log("ready: $url, length: ${finalFile.length()} / $contentLength / $bytesWrite")
                 if (!emitter.isDisposed) {
                     emitter.onSuccess(finalFile.absolutePath)
                 }
@@ -101,7 +103,7 @@ internal object VideoViewCache {
         try {
             if (file.exists()) {
                 val deleted = file.delete()
-                log("delete file: $deleted")
+                log("delete file: $deleted, ${file.name}")
                 return deleted
             }
         } catch (e: Exception) {
@@ -111,21 +113,33 @@ internal object VideoViewCache {
     }
 
     @Throws(IOException::class)
-    internal fun getOutputFile(url: String, context: Context, isTmp: Boolean = false): File {
-        val outputFileDir = getOutputDirPath(context)
-        val fileDir = File(outputFileDir)
-        if (!fileDir.exists()) {
-            fileDir.mkdirs()
-        }
-        var outputFileName = abs(url.hashCode()).toString() + url.split("/").last()
-        if (isTmp) {
-            outputFileName = "tmp_$outputFileName"
-        }
+    internal fun getOutputFile(url: String, context: Context): File {
+        val outputFileDir = getAndCreateOutputDirPath(context)
+        val outputFileName = abs(url.hashCode()).toString() + url.split("/").last()
+        return File(outputFileDir + outputFileName)
+    }
+
+    @Throws(IOException::class)
+    private fun getTempOutputFile(url: String, context: Context): File {
+        val outputFileDir = getAndCreateOutputDirPath(context)
+        val outputFileName = "tmp_" +
+                abs(url.hashCode()).toString() + url.split("/").last() +
+                "${System.nanoTime()}_${abs(Random.nextLong())}"
         return File(outputFileDir + outputFileName)
     }
 
     internal fun getOutputDirPath(context: Context): String =
         context.cacheDir.absolutePath + "/video_view_cache/"
+
+    @Throws(IOException::class)
+    private fun getAndCreateOutputDirPath(context: Context): String {
+        val outputFileDir = getOutputDirPath(context)
+        val fileDir = File(outputFileDir)
+        if (!fileDir.exists()) {
+            fileDir.mkdirs()
+        }
+        return outputFileDir
+    }
 
     private fun File.tryDelete() {
         tryDeleteFile(this)
