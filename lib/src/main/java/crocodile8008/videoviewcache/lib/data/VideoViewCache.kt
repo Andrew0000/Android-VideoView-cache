@@ -68,6 +68,8 @@ internal object VideoViewCache {
 
                 finalFile.tryDelete()
                 tmpFile = getOutputFile(url, context, isTmp = true)
+                tmpFile.tryDelete()
+
                 sink = tmpFile.sink().buffer()
                 body = response.body!!
                 sink.writeAll(body.source())
