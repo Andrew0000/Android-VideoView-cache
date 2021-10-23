@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.VideoView
+import crocodile8008.videoviewcache.lib.data.VideoViewCache
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 /**

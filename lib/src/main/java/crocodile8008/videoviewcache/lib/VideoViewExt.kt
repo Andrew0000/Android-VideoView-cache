@@ -2,6 +2,7 @@ package crocodile8008.videoviewcache.lib
 
 import android.view.View
 import android.widget.VideoView
+import crocodile8008.videoviewcache.lib.data.VideoViewCache
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.*
 

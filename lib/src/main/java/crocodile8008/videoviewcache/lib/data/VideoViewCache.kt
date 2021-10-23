@@ -1,6 +1,8 @@
-package crocodile8008.videoviewcache.lib
+package crocodile8008.videoviewcache.lib.data
 
 import android.content.Context
+import crocodile8008.videoviewcache.lib.closeSilent
+import crocodile8008.videoviewcache.lib.log
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.core.SingleEmitter
