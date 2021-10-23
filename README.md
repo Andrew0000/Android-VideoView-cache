@@ -24,14 +24,16 @@ dependencyResolutionManagement {
 
 # Usage:
 
-**First way**. With extension for android **VideoView**.
+## First way  
+With extension for android **VideoView**.
 
 ```
-videoView.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4")
+videoView.playUrl("https://your/video/file.mp4")
 ```
 
 
-**Second way**. With **VideoViewCached**, that wraps progress bar and performs auto-scaling. 
+## Second way  
+With **VideoViewCached**. It shows progress bar and performs auto-scaling. 
 
 For example in xml:
 
@@ -45,7 +47,7 @@ For example in xml:
 
 And then start loading:
 ```
-cachedVideoView2.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4")
+cachedVideoView2.playUrl("https://your/video/file.mp4")
 ```
 That's all!  
 Video will be downloaded, cached and played.  
