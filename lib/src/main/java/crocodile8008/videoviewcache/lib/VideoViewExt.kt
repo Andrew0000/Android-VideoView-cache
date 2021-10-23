@@ -1,6 +1,7 @@
 package crocodile8008.videoviewcache.lib
 
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.VideoView
 import crocodile8008.videoviewcache.lib.data.VideoViewCache
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -25,7 +26,11 @@ fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
         attachedLoaders[this] = loader
 
         addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+
             override fun onViewAttachedToWindow(v: View?) {
+                loader.onWindowFocusChangeListener?.let {
+                    viewTreeObserver.addOnWindowFocusChangeListener(it)
+                }
                 loader.loadVideoIfHasToLoad()
                 if (loader.playCalled) {
                     loader.videoView.start()
@@ -33,20 +38,26 @@ fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
             }
 
             override fun onViewDetachedFromWindow(v: View?) {
+                loader.onWindowFocusChangeListener?.let {
+                    viewTreeObserver.removeOnWindowFocusChangeListener(it)
+                }
                 loader.disposables.clear()
                 if (loader.videoView.isPlaying) {
                     loader.videoView.stopPlayback()
                 }
             }
-
         })
 
-        val previousListener: View.OnFocusChangeListener? = onFocusChangeListener
-        setOnFocusChangeListener { v, hasFocus ->
-            if (hasFocus && loader.playCalled && !loader.videoView.isPlaying) {
-                loader.videoView.start()
+        loader.onWindowFocusChangeListener =
+            ViewTreeObserver.OnWindowFocusChangeListener { hasFocus ->
+                if (hasFocus && loader.playCalled && !loader.videoView.isPlaying) {
+                    loader.videoView.start()
+                }
             }
-            previousListener?.onFocusChange(v, hasFocus)
+        if (isAttachedToWindow) {
+            loader.onWindowFocusChangeListener?.let {
+                viewTreeObserver.addOnWindowFocusChangeListener(it)
+            }
         }
     }
 
@@ -80,6 +91,7 @@ private class LoaderData(
     var videoToLoad: VideoRequestParam? = null
     var isLoading = false
     val disposables = CompositeDisposable()
+    var onWindowFocusChangeListener: ViewTreeObserver.OnWindowFocusChangeListener? = null
 
     fun loadVideoIfHasToLoad() {
         if (isLoading) {
