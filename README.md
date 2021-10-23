@@ -7,6 +7,7 @@ Cache wrapper for standard android VideoView for downloading and playing video.
 ✔️ No proxy server is needed (like here https://github.com/danikula/AndroidVideoCache).  
 ✔️ Files are storing in the default cache directory.  
 ✔️ Automatic cancellation of the download if view detached from window. No resources leaking.  
+✔️ Headers are supported.  
 
 # Setup:  
 
