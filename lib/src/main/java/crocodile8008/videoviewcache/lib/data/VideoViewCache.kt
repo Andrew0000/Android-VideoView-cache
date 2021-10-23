@@ -15,6 +15,7 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.Exception
 import kotlin.math.abs
@@ -104,8 +105,9 @@ internal object VideoViewCache {
         return false
     }
 
+    @Throws(IOException::class)
     internal fun getOutputFile(url: String, context: Context): File {
-        val outputFileDir = context.cacheDir.absolutePath + "/video_view_cache/"
+        val outputFileDir = getOutputDirPath(context)
         val fileDir = File(outputFileDir)
         if (!fileDir.exists()) {
             fileDir.mkdirs()
@@ -113,4 +115,7 @@ internal object VideoViewCache {
         val outputFileName = abs(url.hashCode()).toString() + url.split("/").last()
         return File(outputFileDir + outputFileName)
     }
+
+    internal fun getOutputDirPath(context: Context): String =
+        context.cacheDir.absolutePath + "/video_view_cache/"
 }
