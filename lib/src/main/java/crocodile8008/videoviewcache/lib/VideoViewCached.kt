@@ -93,7 +93,9 @@ class VideoViewCached : FrameLayout {
         }
 
         videoView.setOnErrorListener { mp: MediaPlayer, what: Int, extra: Int ->
-            progressBar.visibility = GONE
+            if (!isLoading) {
+                progressBar.visibility = GONE
+            }
             mpErrorListener?.onError(mp, what, extra)
             true
         }
