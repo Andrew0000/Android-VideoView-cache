@@ -161,7 +161,7 @@ class VideoViewCached : FrameLayout {
     }
 }
 
-private data class VideoRequestParam(
+internal data class VideoRequestParam(
     val url: String,
     val headers: Map<String, String>?,
 )
