@@ -39,7 +39,7 @@ internal object VideoViewCache {
 
             log("request: $url")
             var finalFile: File? = null
-            var fileTmp: File? = null
+            var tmpFile: File? = null
             var sink: BufferedSink? = null
             var body: ResponseBody? = null
 
@@ -65,11 +65,11 @@ internal object VideoViewCache {
                 val response: Response = okHttpClient.newCall(request).execute()
 
                 finalFile.tryDelete()
-                fileTmp = getOutputFile(url, context, isTmp = true)
-                sink = fileTmp.sink().buffer()
+                tmpFile = getOutputFile(url, context, isTmp = true)
+                sink = tmpFile.sink().buffer()
                 body = response.body!!
                 sink.writeAll(body.source())
-                fileTmp.renameTo(finalFile)
+                tmpFile.renameTo(finalFile)
 
                 log("ready: $url")
                 if (!emitter.isDisposed) {
@@ -85,7 +85,7 @@ internal object VideoViewCache {
             } finally {
                 sink.closeSilent()
                 body.closeSilent()
-                fileTmp?.tryDelete()
+                tmpFile?.tryDelete()
             }
         }
         .retry(1)
