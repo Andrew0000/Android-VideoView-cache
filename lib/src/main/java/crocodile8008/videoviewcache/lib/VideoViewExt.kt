@@ -41,12 +41,12 @@ fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
 
         })
 
-        val previousListener = onFocusChangeListener
+        val previousListener: View.OnFocusChangeListener? = onFocusChangeListener
         setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus && loader.playCalled && !loader.videoView.isPlaying) {
                 loader.videoView.start()
             }
-            previousListener.onFocusChange(v, hasFocus)
+            previousListener?.onFocusChange(v, hasFocus)
         }
     }
 
