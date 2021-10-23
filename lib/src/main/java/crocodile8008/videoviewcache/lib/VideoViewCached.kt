@@ -4,12 +4,17 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.VideoView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
+/**
+ * [VideoView] that wrapped into frame and supports loading with caching.
+ * Also it has a progress bar and auto scaling of video.
+ */
 class VideoViewCached : FrameLayout {
 
     constructor(context: Context) : super(context) {
@@ -90,6 +95,12 @@ class VideoViewCached : FrameLayout {
         }
     }
 
+    /**
+     * Start loading with caching and playing.
+     *
+     * Note: loading will be stopped in [View.OnAttachStateChangeListener.onViewDetachedFromWindow]
+     * and resumed in [View.OnAttachStateChangeListener.onViewAttachedToWindow].
+     */
     @Suppress("Unused")
     fun playUrl(url: String, headers: Map<String, String>? = null) {
         disposables.clear()
@@ -99,6 +110,9 @@ class VideoViewCached : FrameLayout {
         playCalled = true
     }
 
+    /**
+     * Stop loading and playing.
+     */
     @Suppress("Unused")
     fun stop() {
         disposables.clear()

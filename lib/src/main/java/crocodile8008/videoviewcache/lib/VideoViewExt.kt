@@ -9,6 +9,12 @@ private val attachedLoaders by lazy {
     WeakHashMap<VideoView, LoaderData>()
 }
 
+/**
+ * Start loading with caching and playing.
+ *
+ * Note: loading will be stopped in [View.OnAttachStateChangeListener.onViewDetachedFromWindow]
+ * and resumed in [View.OnAttachStateChangeListener.onViewAttachedToWindow].
+ */
 @Suppress("Unused")
 fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
     var loader = attachedLoaders[this]
@@ -51,6 +57,9 @@ fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
     }
 }
 
+/**
+ * Stop loading and playing.
+ */
 @Suppress("Unused")
 fun VideoView.stop() {
     val loader = attachedLoaders[this]
