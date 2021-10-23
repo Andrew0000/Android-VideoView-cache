@@ -38,17 +38,17 @@ internal object VideoViewCache {
         .create { emitter: SingleEmitter<String> ->
 
             log("request: $url")
-            var file: File? = null
+            var finalFile: File? = null
             var fileTmp: File? = null
             var sink: BufferedSink? = null
             var body: ResponseBody? = null
 
             try {
-                file = getOutputFile(url, context)
-                if (file.exists() && file.length() > 0) {
+                finalFile = getOutputFile(url, context)
+                if (finalFile.exists() && finalFile.length() > 0) {
                     log("cached: $url")
                     if (!emitter.isDisposed) {
-                        emitter.onSuccess(file.absolutePath)
+                        emitter.onSuccess(finalFile.absolutePath)
                         return@create
                     }
                 }
@@ -64,20 +64,20 @@ internal object VideoViewCache {
 
                 val response: Response = okHttpClient.newCall(request).execute()
 
-                file.tryDelete()
+                finalFile.tryDelete()
                 fileTmp = getOutputFile(url, context, isTmp = true)
                 sink = fileTmp.sink().buffer()
                 body = response.body!!
                 sink.writeAll(body.source())
-                fileTmp.renameTo(file)
+                fileTmp.renameTo(finalFile)
 
                 log("ready: $url")
                 if (!emitter.isDisposed) {
-                    emitter.onSuccess(file.absolutePath)
+                    emitter.onSuccess(finalFile.absolutePath)
                 }
             } catch (e: Exception) {
                 val interrupted = Thread.interrupted()
-                file?.tryDelete()
+                finalFile?.tryDelete()
                 log("request exception: $e" + ", was interrupted: $interrupted, url: $url")
                 if (!emitter.isDisposed) {
                     emitter.tryOnError(e)
