@@ -25,4 +25,24 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintHeight_max="200dp"/>
 
+    <Button
+        android:id="@+id/btnClean"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Clean cache"
+        app:layout_constraintBottom_toTopOf="@id/btnRecycler"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/btnRecycler"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Recycler sample"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="HardcodedText" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
