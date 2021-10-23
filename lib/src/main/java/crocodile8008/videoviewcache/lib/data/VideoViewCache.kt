@@ -15,8 +15,8 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import java.io.File
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
+import kotlin.Exception
 import kotlin.math.abs
 
 internal object VideoViewCache {
@@ -91,18 +91,20 @@ internal object VideoViewCache {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 
-    private fun tryDeleteFile(file: File) {
+    internal fun tryDeleteFile(file: File): Boolean {
         try {
             if (file.exists()) {
                 val deleted = file.delete()
                 log("delete file: $deleted")
+                return deleted
             }
-        } catch (e: Error) {
+        } catch (e: Exception) {
             log("try delete file: $e")
         }
+        return false
     }
 
-    private fun getOutputFile(url: String, context: Context): File {
+    internal fun getOutputFile(url: String, context: Context): File {
         val outputFileDir = context.cacheDir.absolutePath + "/video_view_cache/"
         val fileDir = File(outputFileDir)
         if (!fileDir.exists()) {
