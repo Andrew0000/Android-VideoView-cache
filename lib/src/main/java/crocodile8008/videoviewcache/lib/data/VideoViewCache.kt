@@ -38,8 +38,8 @@ internal object VideoViewCache {
         .create { emitter: SingleEmitter<String> ->
 
             log("request: $url")
-            var isWritingToFile = false
             var file: File? = null
+            var fileTmp: File? = null
             var sink: BufferedSink? = null
             var body: ResponseBody? = null
 
@@ -64,10 +64,12 @@ internal object VideoViewCache {
 
                 val response: Response = okHttpClient.newCall(request).execute()
 
-                isWritingToFile = true
-                sink = file.sink().buffer()
+                file.tryDelete()
+                fileTmp = getOutputFile(url, context, isTmp = true)
+                sink = fileTmp.sink().buffer()
                 body = response.body!!
                 sink.writeAll(body.source())
+                fileTmp.renameTo(file)
 
                 log("ready: $url")
                 if (!emitter.isDisposed) {
@@ -75,17 +77,15 @@ internal object VideoViewCache {
                 }
             } catch (e: Exception) {
                 val interrupted = Thread.interrupted()
-                if (isWritingToFile && file != null) {
-                    tryDeleteFile(file)
-                }
-                log("request exception: $e" +
-                        ", was interrupted: $interrupted, isWritingToFile: $isWritingToFile")
+                file?.tryDelete()
+                log("request exception: $e" + ", was interrupted: $interrupted, url: $url")
                 if (!emitter.isDisposed) {
                     emitter.tryOnError(e)
                 }
             } finally {
                 sink.closeSilent()
                 body.closeSilent()
+                fileTmp?.tryDelete()
             }
         }
         .retry(1)
@@ -105,14 +105,21 @@ internal object VideoViewCache {
         return false
     }
 
+    internal fun File.tryDelete() {
+        tryDeleteFile(this)
+    }
+
     @Throws(IOException::class)
-    internal fun getOutputFile(url: String, context: Context): File {
+    internal fun getOutputFile(url: String, context: Context, isTmp: Boolean = false): File {
         val outputFileDir = getOutputDirPath(context)
         val fileDir = File(outputFileDir)
         if (!fileDir.exists()) {
             fileDir.mkdirs()
         }
-        val outputFileName = abs(url.hashCode()).toString() + url.split("/").last()
+        var outputFileName = abs(url.hashCode()).toString() + url.split("/").last()
+        if (isTmp) {
+            outputFileName = "tmp_$outputFileName"
+        }
         return File(outputFileDir + outputFileName)
     }
 
