@@ -45,7 +45,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 
     libDepLocalImplementation project(':lib')
-    libDepJitpackImplementation 'com.github.Andrew0000:Android-VideoView-cache:1.0.3'
+    libDepJitpackImplementation 'com.github.Andrew0000:Android-VideoView-cache:1.+'
 
     testImplementation 'junit:junit:4.+'
 
