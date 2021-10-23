@@ -6,6 +6,7 @@ import android.view.ViewTreeObserver
 import android.widget.VideoView
 import crocodile8008.videoviewcache.lib.data.VideoViewCache
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.lang.ref.WeakReference
 import java.util.*
 
 private val attachedLoaders by lazy {
@@ -22,8 +23,10 @@ private val attachedLoaders by lazy {
 fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
     var loader = attachedLoaders[this]
     log("[ext] playUrl: $loader, $url")
+    log("[ext] attachedLoaders: ${attachedLoaders.size}")
+
     if (loader == null) {
-        loader = LoaderData(this)
+        loader = LoaderData(WeakReference(this))
         attachedLoaders[this] = loader
 
         addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -34,7 +37,7 @@ fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
                 }
                 loader.loadVideoIfHasToLoad()
                 if (loader.playCalled) {
-                    loader.videoView.start()
+                    loader.videoView?.start()
                 }
             }
 
@@ -43,16 +46,18 @@ fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
                     viewTreeObserver.removeOnWindowFocusChangeListener(it)
                 }
                 loader.disposables.clear()
-                if (loader.videoView.isPlaying) {
-                    loader.videoView.stopPlayback()
+                loader.videoView?.let { videoView ->
+                    if (videoView.isPlaying) {
+                        videoView.stopPlayback()
+                    }
                 }
             }
         })
 
         loader.onWindowFocusChangeListener =
             ViewTreeObserver.OnWindowFocusChangeListener { hasFocus ->
-                if (hasFocus && loader.playCalled && !loader.videoView.isPlaying) {
-                    loader.videoView.start()
+                if (hasFocus && loader.playCalled && loader.videoView?.isPlaying != true) {
+                    loader.videoView?.start()
                 }
             }
         if (isAttachedToWindow) {
@@ -81,14 +86,14 @@ fun VideoView.stop() {
         return
     }
     loader.disposables.clear()
-    loader.videoView.stopPlayback()
+    loader.videoView?.stopPlayback()
     // VideoView may play previous video so it helps to reset.
-    loader.videoView.setBackgroundColor(Color.BLACK)
+    loader.videoView?.setBackgroundColor(Color.BLACK)
     loader.playCalled = false
 }
 
 private class LoaderData(
-    val videoView: VideoView,
+    val videoViewRef: WeakReference<VideoView>,
 ) {
     var playCalled = false
     var videoToLoad: VideoRequestParam? = null
@@ -96,14 +101,18 @@ private class LoaderData(
     val disposables = CompositeDisposable()
     var onWindowFocusChangeListener: ViewTreeObserver.OnWindowFocusChangeListener? = null
 
+    val videoView: VideoView?
+        get() = videoViewRef.get()
+
     fun loadVideoIfHasToLoad() {
         if (isLoading) {
             return
         }
         videoToLoad?.let {
+            val context = videoView?.context ?: return@let
             isLoading = true
             val disposable = VideoViewCache
-                .loadInFileCached(it.url, it.headers, videoView.context)
+                .loadInFileCached(it.url, it.headers, context)
                 .doFinally {
                     isLoading = false
                 }
@@ -112,10 +121,12 @@ private class LoaderData(
                         if (filePath.isEmpty()) {
                             return@subscribe
                         }
-                        videoView.setVideoPath(filePath)
-                        videoView.start()
                         videoToLoad = null
-                        videoView.background = null
+                        videoView?.apply {
+                            setVideoPath(filePath)
+                            start()
+                            background = null
+                        }
                     },
                     { t ->
                         log("$t")
