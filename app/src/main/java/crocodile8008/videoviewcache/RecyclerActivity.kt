@@ -2,6 +2,7 @@ package crocodile8008.videoviewcache
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import android.widget.VideoView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,17 +44,21 @@ class RecyclerActivity : AppCompatActivity() {
 
     private fun createVideoViewAdapterDelegate() = adapterDelegate<UrlForVideoView, Any>(R.layout.item_video_view) {
         val videoView : VideoView = findViewById(R.id.itemVideoView)
+        val numTextView : TextView = findViewById(R.id.numTextView)
         bind {
             videoView.stop()
             videoView.playUrl(item.url)
+            numTextView.text = (adapterPosition + 1).toString()
         }
     }
 
     private fun createVideoViewCachedAdapterDelegate() = adapterDelegate<UrlForVideoViewCached, Any>(R.layout.item_video_view_cached) {
         val itemVideoViewCached : VideoViewCached = findViewById(R.id.itemVideoViewCached)
+        val numTextView : TextView = findViewById(R.id.numTextView)
         bind {
             itemVideoViewCached.stop()
             itemVideoViewCached.playUrl(item.url)
+            numTextView.text = (adapterPosition + 1).toString()
         }
     }
 }

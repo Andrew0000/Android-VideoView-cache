@@ -12,6 +12,7 @@
         android:layout_height="match_parent"/>
 
     <TextView
+        android:id="@+id/itemTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -19,5 +20,15 @@
         android:text="VideoViewCached"
         android:textColor="#999"
         tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/numTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|top"
+        android:gravity="center"
+        android:textColor="#999"
+        android:textSize="24sp"
+        tools:text="1" />
 
 </FrameLayout>
