@@ -78,7 +78,7 @@ internal object VideoViewCache {
             } catch (e: Exception) {
                 val interrupted = Thread.interrupted()
                 finalFile?.tryDelete()
-                log("request exception: $e" + ", was interrupted: $interrupted, url: $url")
+                log("request exception: $e, was interrupted: $interrupted, url: $url")
                 if (!emitter.isDisposed) {
                     emitter.tryOnError(e)
                 }
@@ -105,10 +105,6 @@ internal object VideoViewCache {
         return false
     }
 
-    internal fun File.tryDelete() {
-        tryDeleteFile(this)
-    }
-
     @Throws(IOException::class)
     internal fun getOutputFile(url: String, context: Context, isTmp: Boolean = false): File {
         val outputFileDir = getOutputDirPath(context)
@@ -125,4 +121,8 @@ internal object VideoViewCache {
 
     internal fun getOutputDirPath(context: Context): String =
         context.cacheDir.absolutePath + "/video_view_cache/"
+
+    private fun File.tryDelete() {
+        tryDeleteFile(this)
+    }
 }
