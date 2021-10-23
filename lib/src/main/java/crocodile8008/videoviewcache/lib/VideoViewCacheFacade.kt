@@ -4,12 +4,15 @@ package crocodile8008.videoviewcache.lib
 
 import android.content.Context
 import crocodile8008.videoviewcache.lib.data.VideoViewCache
+import okhttp3.OkHttpClient
 import java.io.File
 import java.io.IOException
 
 object VideoViewCacheFacade {
 
     var logEnabled: Boolean = false
+
+    var customOkHttpClient: OkHttpClient? = null
 
     @Throws(IOException::class)
     fun cleanCacheFor(url: String, context: Context): Boolean =

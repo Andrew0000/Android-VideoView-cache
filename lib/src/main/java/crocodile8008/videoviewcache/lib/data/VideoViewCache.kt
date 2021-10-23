@@ -1,6 +1,7 @@
 package crocodile8008.videoviewcache.lib.data
 
 import android.content.Context
+import crocodile8008.videoviewcache.lib.VideoViewCacheFacade
 import crocodile8008.videoviewcache.lib.closeSilent
 import crocodile8008.videoviewcache.lib.log
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -22,7 +23,7 @@ import kotlin.math.abs
 
 internal object VideoViewCache {
 
-    private val okHttpClient by lazy {
+    private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -62,7 +63,8 @@ internal object VideoViewCache {
                     }
                     .build()
 
-                val response: Response = okHttpClient.newCall(request).execute()
+                val client = VideoViewCacheFacade.customOkHttpClient ?: okHttpClient
+                val response: Response = client.newCall(request).execute()
 
                 finalFile.tryDelete()
                 tmpFile = getOutputFile(url, context, isTmp = true)
