@@ -7,6 +7,9 @@ dependencyResolutionManagement {
         maven { url "https://jitpack.io" }
     }
 }
+
 rootProject.name = "Video view cache"
-include ':app'
+if (!System.env.JITPACK) {
+    include ':app'
+}
 include ':lib'
