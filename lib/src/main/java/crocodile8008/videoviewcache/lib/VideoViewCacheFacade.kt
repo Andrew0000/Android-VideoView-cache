@@ -4,6 +4,7 @@ package crocodile8008.videoviewcache.lib
 
 import android.content.Context
 import crocodile8008.videoviewcache.lib.data.VideoViewCache
+import crocodile8008.videoviewcache.lib.utils.tryDelete
 import okhttp3.OkHttpClient
 import java.io.File
 import java.io.IOException
@@ -16,9 +17,7 @@ object VideoViewCacheFacade {
 
     @Throws(IOException::class)
     fun cleanCacheFor(url: String, context: Context): Boolean =
-        VideoViewCache.tryDeleteFile(
-            VideoViewCache.getOutputFile(url, context)
-        )
+        VideoViewCache.getOutputFile(url, context).tryDelete()
 
     @Throws(IOException::class)
     fun getOutputFile(url: String, context: Context): File = VideoViewCache.getOutputFile(url, context)

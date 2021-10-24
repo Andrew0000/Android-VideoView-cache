@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.VideoView
 import crocodile8008.videoviewcache.lib.data.VideoViewCache
+import crocodile8008.videoviewcache.lib.utils.log
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 /**
@@ -31,12 +32,29 @@ class VideoViewCached : FrameLayout {
         init()
     }
 
+    /**
+     * DO NOT do from outside:
+     * - Set background
+     * - Scale
+     * - Set setOnPreparedListener / setOnErrorListener
+     * - Show / hide
+     * - Detach
+     */
     lateinit var videoView: VideoView
         private set
 
+    /**
+     * DO NOT do from outside:
+     * - Show / hide
+     * - Detach
+     */
     lateinit var progressBar: ProgressBar
         private set
 
+    /**
+     * DO NOT modify from outside.
+     * Just for getting information about last prepared video.
+     */
     var mediaPlayer: MediaPlayer? = null
         private set
 
@@ -67,33 +85,7 @@ class VideoViewCached : FrameLayout {
             mediaPlayer = mp
             if (autoScale) {
                 post {
-                    // At this moment it's not working:
-                    // mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
-                    // So scale video view manually
-                    try {
-                        val videoRatio = mp.videoWidth / mp.videoHeight.toFloat()
-                        val frameRatio = width / height.toFloat()
-                        var scaleXNew = videoRatio / frameRatio
-
-                        // Sometimes there is 1px missing so scale little more
-                        if (scaleXNew > 1f) {
-                            scaleXNew += 0.001f
-                        } else if (scaleXNew < 1f) {
-                            scaleXNew -= 0.001f
-                        }
-                        log(
-                            "scale x: $scaleXNew" +
-                                    ". video: ${mp.videoWidth} / ${mp.videoHeight} ($videoRatio)" +
-                                    ". frame: $width / $height ($frameRatio)"
-                        )
-                        if (scaleXNew >= 1f) {
-                            videoView.scaleY = scaleXNew
-                        } else {
-                            videoView.scaleX = 1f / scaleXNew
-                        }
-                    } catch (t: Throwable) {
-                        commonErrorListener(t)
-                    }
+                    tryAutoScale(mp)
                 }
             }
             mpPreparedListener?.onPrepared(mp)
@@ -160,6 +152,36 @@ class VideoViewCached : FrameLayout {
         }
     }
 
+    private fun tryAutoScale(mp: MediaPlayer) {
+        // After OnPrepared it's not working:
+        // mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
+        // So scale video view manually
+        try {
+            val videoRatio = mp.videoWidth / mp.videoHeight.toFloat()
+            val frameRatio = width / height.toFloat()
+            var scaleXNew = videoRatio / frameRatio
+
+            // Sometimes there is 1px missing so scale little more
+            if (scaleXNew > 1f) {
+                scaleXNew += 0.001f
+            } else if (scaleXNew < 1f) {
+                scaleXNew -= 0.001f
+            }
+            log(
+                "scale x: $scaleXNew" +
+                        ". video: ${mp.videoWidth} / ${mp.videoHeight} ($videoRatio)" +
+                        ". frame: $width / $height ($frameRatio)"
+            )
+            if (scaleXNew >= 1f) {
+                videoView.scaleY = scaleXNew
+            } else {
+                videoView.scaleX = 1f / scaleXNew
+            }
+        } catch (t: Throwable) {
+            commonErrorListener(t)
+        }
+    }
+
     private fun loadVideoIfHasToLoad() {
         if (isLoading) {
             return
@@ -178,9 +200,11 @@ class VideoViewCached : FrameLayout {
                             return@subscribe
                         }
                         videoToLoad = null
-                        videoView.setVideoPath(filePath)
-                        videoView.start()
-                        videoView.background = null
+                        videoView.apply {
+                            setVideoPath(filePath)
+                            start()
+                            background = null
+                        }
                     },
                     { t ->
                         progressBar.visibility = GONE

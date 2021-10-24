@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.VideoView
 import crocodile8008.videoviewcache.lib.data.VideoViewCache
+import crocodile8008.videoviewcache.lib.utils.log
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.lang.ref.WeakReference
 import java.util.*
@@ -28,43 +29,7 @@ fun VideoView.playUrl(url: String, headers: Map<String, String>? = null) {
     if (loader == null) {
         loader = LoaderData(WeakReference(this))
         attachedLoaders[this] = loader
-
-        addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-
-            override fun onViewAttachedToWindow(v: View?) {
-                loader.onWindowFocusChangeListener?.let {
-                    viewTreeObserver.addOnWindowFocusChangeListener(it)
-                }
-                loader.loadVideoIfHasToLoad()
-                if (loader.playCalled) {
-                    loader.videoView?.start()
-                }
-            }
-
-            override fun onViewDetachedFromWindow(v: View?) {
-                loader.onWindowFocusChangeListener?.let {
-                    viewTreeObserver.removeOnWindowFocusChangeListener(it)
-                }
-                loader.disposables.clear()
-                loader.videoView?.let { videoView ->
-                    if (videoView.isPlaying) {
-                        videoView.stopPlayback()
-                    }
-                }
-            }
-        })
-
-        loader.onWindowFocusChangeListener =
-            ViewTreeObserver.OnWindowFocusChangeListener { hasFocus ->
-                if (hasFocus && loader.playCalled && loader.videoView?.isPlaying != true) {
-                    loader.videoView?.start()
-                }
-            }
-        if (isAttachedToWindow) {
-            loader.onWindowFocusChangeListener?.let {
-                viewTreeObserver.addOnWindowFocusChangeListener(it)
-            }
-        }
+        attachToViewLifecycle(loader)
     }
 
     loader.apply {
@@ -92,6 +57,33 @@ fun VideoView.stop() {
     loader.playCalled = false
 }
 
+private fun VideoView.attachToViewLifecycle(loader: LoaderData) {
+    addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+
+        override fun onViewAttachedToWindow(v: View?) {
+            viewTreeObserver.addOnWindowFocusChangeListener(loader.onWindowFocusListener)
+            loader.loadVideoIfHasToLoad()
+            if (loader.playCalled) {
+                loader.videoView?.start()
+            }
+        }
+
+        override fun onViewDetachedFromWindow(v: View?) {
+            viewTreeObserver.removeOnWindowFocusChangeListener(loader.onWindowFocusListener)
+            loader.disposables.clear()
+            loader.videoView?.let { videoView ->
+                if (videoView.isPlaying) {
+                    videoView.stopPlayback()
+                }
+            }
+        }
+    })
+
+    if (isAttachedToWindow) {
+        viewTreeObserver.addOnWindowFocusChangeListener(loader.onWindowFocusListener)
+    }
+}
+
 private class LoaderData(
     val videoViewRef: WeakReference<VideoView>,
 ) {
@@ -99,7 +91,13 @@ private class LoaderData(
     var videoToLoad: VideoRequestParam? = null
     var isLoading = false
     val disposables = CompositeDisposable()
-    var onWindowFocusChangeListener: ViewTreeObserver.OnWindowFocusChangeListener? = null
+
+    val onWindowFocusListener: ViewTreeObserver.OnWindowFocusChangeListener =
+        ViewTreeObserver.OnWindowFocusChangeListener { hasFocus ->
+            if (hasFocus && playCalled && videoView?.isPlaying != true) {
+                videoView?.start()
+            }
+        }
 
     val videoView: VideoView?
         get() = videoViewRef.get()

@@ -2,8 +2,9 @@ package crocodile8008.videoviewcache.lib.data
 
 import android.content.Context
 import crocodile8008.videoviewcache.lib.VideoViewCacheFacade
-import crocodile8008.videoviewcache.lib.closeSilent
-import crocodile8008.videoviewcache.lib.log
+import crocodile8008.videoviewcache.lib.utils.closeSilent
+import crocodile8008.videoviewcache.lib.utils.log
+import crocodile8008.videoviewcache.lib.utils.tryDelete
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.core.SingleEmitter
@@ -56,20 +57,12 @@ internal object VideoViewCache {
                     }
                 }
 
-                val request: Request = Request.Builder()
-                    .url(url)
-                    .also { builder ->
-                        headers?.entries?.forEach { (name, value) ->
-                            builder.addHeader(name, value)
-                        }
-                    }
-                    .build()
-
-                val client = VideoViewCacheFacade.customOkHttpClient ?: okHttpClient
-                val response: Response = client.newCall(request).execute()
-
                 finalFile.tryDelete()
                 tmpFile = getTempOutputFile(url, context)
+
+                val request: Request = buildRequest(url, headers)
+                val client = VideoViewCacheFacade.customOkHttpClient ?: okHttpClient
+                val response: Response = client.newCall(request).execute()
 
                 sink = tmpFile.sink().buffer()
                 body = response.body!!
@@ -99,18 +92,8 @@ internal object VideoViewCache {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 
-    internal fun tryDeleteFile(file: File): Boolean {
-        try {
-            if (file.exists()) {
-                val deleted = file.delete()
-                log("delete file: $deleted, ${file.name}")
-                return deleted
-            }
-        } catch (e: Exception) {
-            log("try delete file: $e")
-        }
-        return false
-    }
+    internal fun getOutputDirPath(context: Context): String =
+        context.cacheDir.absolutePath + "/video_view_cache/"
 
     @Throws(IOException::class)
     internal fun getOutputFile(url: String, context: Context): File {
@@ -128,9 +111,6 @@ internal object VideoViewCache {
         return File(outputFileDir + outputFileName)
     }
 
-    internal fun getOutputDirPath(context: Context): String =
-        context.cacheDir.absolutePath + "/video_view_cache/"
-
     @Throws(IOException::class)
     private fun getAndCreateOutputDirPath(context: Context): String {
         val outputFileDir = getOutputDirPath(context)
@@ -141,7 +121,15 @@ internal object VideoViewCache {
         return outputFileDir
     }
 
-    private fun File.tryDelete() {
-        tryDeleteFile(this)
-    }
+    private fun buildRequest(
+        url: String,
+        headers: Map<String, String>?,
+    ) = Request.Builder()
+        .url(url)
+        .also { builder ->
+            headers?.entries?.forEach { (name, value) ->
+                builder.addHeader(name, value)
+            }
+        }
+        .build()
 }
