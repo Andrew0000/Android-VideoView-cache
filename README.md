@@ -41,16 +41,18 @@ videoView.playUrl("https://your/video/file.mp4")
 ## Second way  
 With **VideoViewCached**. It shows progress bar and performs auto-scaling. 
 
-For example in xml:
+For example in xml:  
 
-    <crocodile8008.videoviewcache.lib.VideoViewCached
-        android:id="@+id/cachedVideoView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+```
+<crocodile8008.videoviewcache.lib.VideoViewCached
+    android:id="@+id/cachedVideoView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+```
 
 And then start loading:
 ```
-cachedVideoView2.playUrl("https://your/video/file.mp4")
+cachedVideoView.playUrl("https://your/video/file.mp4")
 ```
 That's all!  
 Video will be downloaded, cached and played.  
