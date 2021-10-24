@@ -73,7 +73,14 @@ class VideoViewCached : FrameLayout {
                     try {
                         val videoRatio = mp.videoWidth / mp.videoHeight.toFloat()
                         val frameRatio = width / height.toFloat()
-                        val scaleXNew = videoRatio / frameRatio
+                        var scaleXNew = videoRatio / frameRatio
+
+                        // Sometimes there is 1px missing so scale little more
+                        if (scaleXNew > 1f) {
+                            scaleXNew += 0.001f
+                        } else if (scaleXNew < 1f) {
+                            scaleXNew -= 0.001f
+                        }
                         log(
                             "scale x: $scaleXNew" +
                                     ". video: ${mp.videoWidth} / ${mp.videoHeight} ($videoRatio)" +
