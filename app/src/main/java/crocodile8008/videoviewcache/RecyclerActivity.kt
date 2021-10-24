@@ -16,7 +16,7 @@ class RecyclerActivity : AppCompatActivity() {
 
     private lateinit var recycler: RecyclerView
 
-    private val adapter by lazy {
+    private val delegationAdapter by lazy {
         ListDelegationAdapter(
             createVideoViewAdapterDelegate(),
             createVideoViewCachedAdapterDelegate(),
@@ -27,10 +27,13 @@ class RecyclerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recycler)
         recycler = findViewById(R.id.recycler)
-        recycler.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
-        recycler.adapter = adapter
+        recycler.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(this@RecyclerActivity, RecyclerView.HORIZONTAL, false)
+            adapter = delegationAdapter
+        }
 
-        adapter.items = listOf(
+        delegationAdapter.items = listOf(
             UrlForVideoView("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4"),
             UrlForVideoViewCached("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_640_3MG.mp4"),
             UrlForVideoView("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4"),

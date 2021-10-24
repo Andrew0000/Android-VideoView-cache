@@ -33,13 +33,23 @@ class MainActivity : AppCompatActivity() {
 
         VideoViewCacheFacade.logEnabled = BuildConfig.DEBUG
 
+        setupVideoViewCached()
+        setupVideoView1()
+        setupVideoView2()
+        setupCleanButton()
+        setupRecyclerButton()
+    }
+
+    private fun setupVideoViewCached() {
         cachedVideoView.apply {
             mpPreparedListener = MediaPlayer.OnPreparedListener {
                 it.isLooping = true
             }
             cachedVideoView.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1920_18MG.mp4")
         }
+    }
 
+    private fun setupVideoView1() {
         videoView.apply {
             setOnPreparedListener {
                 it.isLooping = true
@@ -49,7 +59,9 @@ class MainActivity : AppCompatActivity() {
             }
             videoView.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4")
         }
+    }
 
+    private fun setupVideoView2() {
         videoView2.apply {
             setOnPreparedListener {
                 it.isLooping = true
@@ -59,7 +71,9 @@ class MainActivity : AppCompatActivity() {
             }
             videoView2.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4")
         }
+    }
 
+    private fun setupCleanButton() {
         btnClean.setOnClickListener {
             cachedVideoView.stop()
             videoView.stop()
@@ -72,7 +86,9 @@ class MainActivity : AppCompatActivity() {
             videoView.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4")
             videoView2.playUrl("https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4")
         }
+    }
 
+    private fun setupRecyclerButton() {
         btnRecycler.setOnClickListener {
             startActivity(Intent(this, RecyclerActivity::class.java))
         }
