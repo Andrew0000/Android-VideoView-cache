@@ -8,6 +8,7 @@ Cache wrapper for standard android VideoView for downloading and playing video.
 ✔️ Files are storing in the default cache directory.  
 ✔️ Automatic cancellation of the download if view detached from window. No resources leaking.  
 ✔️ Headers are supported.  
+❌ Doesn't support streaming playback. Video file will be downloaded and then played.  
 
 # Setup:  
 
