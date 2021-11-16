@@ -14,7 +14,7 @@ Cache wrapper for standard android VideoView for downloading and playing video.
 
 [![](https://jitpack.io/v/Andrew0000/Android-VideoView-cache.svg)](https://jitpack.io/#Andrew0000/Android-VideoView-cache)
 
-1. Add `maven { url 'https://jitpack.io' }` to the `allprojects` or `dependencyResolutionManagement` section in top-leve `build.gradle` or `settings.gradle`.  
+1. Add `maven { url 'https://jitpack.io' }` to the `allprojects` or `dependencyResolutionManagement` section in top-level `build.gradle` or `settings.gradle`.  
 For example (`settings.gradle`):
 ```
 dependencyResolutionManagement {
