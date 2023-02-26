@@ -2,7 +2,7 @@
 Cache wrapper for standard android VideoView for downloading and playing video.
 
 ✔️ One-line usage.  
-✔️ Works with android VideoView or withs wrapper. Both are almost the same.  
+✔️ Works with android VideoView or with wrapper. Both are almost the same.  
 ✔️ Lightweight. It uses only Okhttp and Rxjava inside.  
 ✔️ No proxy server is needed (like here https://github.com/danikula/AndroidVideoCache).  
 ✔️ Files are storing in the default cache directory.  
